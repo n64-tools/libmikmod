@@ -117,10 +117,12 @@ static void _mm_registeralldrivers(void)
 #ifdef DRV_PSP
 	_mm_registerdriver(&drv_psp);
 #endif
+#ifdef DRV_N64
+	_mm_registerdriver(&drv_n64);
+#endif
 #ifdef DRV_OSLES
 	_mm_registerdriver(&drv_osles);
 #endif
-
 	/* dos drivers - wss first, since some cards emulate sb */
 #ifdef DRV_WSS
 	_mm_registerdriver(&drv_wss);

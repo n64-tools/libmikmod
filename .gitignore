@@ -12,3 +12,9 @@ build/*.o
 *.swp
 *~
 /n64/build
+*.tmp
+*~
+*.VC.db*
+*properties.json
+/.vs
+/.vscode

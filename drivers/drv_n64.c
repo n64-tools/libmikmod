@@ -20,18 +20,17 @@
 
 /*==============================================================================
 
-  $Id: drv_nos.c,v 1.3 2004/01/31 22:39:40 raph Exp $
+  $Id: drv_n64.c,v 1.2 2016/12/22 22:39:40 networkfusion Exp $
 
-  Driver for no output
+  Driver for N64
 
 ==============================================================================*/
 
 /*
 
-	Written by Jean-Paul Mikkers <mikmak@via.nl>
+	Written by Jean-Paul Mikkers <mikmak@via.nl> & Robin Jones
 
 */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -39,6 +38,8 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#ifdef DRV_N64
 
 #include <malloc.h>
 #include <audio.h>
@@ -69,29 +70,29 @@ static void NS_Exit(void)
 
 static void NS_Update(void)
 {
-    if (audio_can_write())
+    //if (audio_can_write())
+    //{
+    /* Grab original */
+    if (md_mode & DMODE_STEREO)
     {
-	/* Grab original */
-		if (md_mode & DMODE_STEREO)
-		{
-			VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * 2 * sizeof(short));
-			audio_write(buffer);
-		}
-		else
-		{
-			/* Must dick around a bit for mono */
-			VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * sizeof(short));
-
-			for (int i = audio_get_buffer_length() - 1; i >= 0; i--)
-			{
-			/* Copy in place must also work for byte zero */
-			buffer[(i * 2) + 1] = buffer[i];
-			buffer[i * 2] = buffer[i];
-			}
-
-			audio_write(buffer);
-		}
+        VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * 2 * sizeof(short));
+        audio_write(buffer);
     }
+    else
+    {
+        /* Must dick around a bit for mono */
+        VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * sizeof(short));
+
+        for (int i = audio_get_buffer_length() - 1; i >= 0; i--)
+        {
+            /* Copy in place must also work for byte zero */
+            buffer[(i * 2) + 1] = buffer[i];
+            buffer[i * 2] = buffer[i];
+        }
+
+        audio_write(buffer);
+    }
+    //}
 }
 
 MIKMODAPI MDRIVER drv_n64 = {
@@ -128,3 +129,6 @@ MIKMODAPI MDRIVER drv_n64 = {
     VC_VoiceRealVolume};
 
 /* ex:set ts=4: */
+#else
+    MISSING(drv_n64);
+#endif
