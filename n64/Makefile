@@ -7,15 +7,15 @@ AS = $(N64PREFIX)as
 LD = $(N64PREFIX)ld
 AR = $(N64PREFIX)ar
 
-all: libmikmod.a
+all: createdir libmikmod.a
 
 include files.in
 
 libmikmod.a: $(OFILES)
 	$(AR) -rcs -o libmikmod.a $(OFILES)
 
-$(CURDIR)/build/:
-	mkdir $(CURDIR)/build
+createdir:
+	@mkdir -p $(CURDIR)/build/
 
 install: libmikmod.a $(CURDIR)/../include/mikmod.h
 	install -m 0644 libmikmod.a $(INSTALLDIR)/lib/libmikmod.a

@@ -11,3 +11,4 @@ build/*.o
 *.tmp
 *.swp
 *~
+/n64/build

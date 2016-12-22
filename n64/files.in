@@ -1,4 +1,5 @@
 OFILES  = $(CURDIR)/build/drv_n64.o
+OFILES  = $(CURDIR)/build/drv_nos.o
 OFILES += $(CURDIR)/build/mmalloc.o
 OFILES += $(CURDIR)/build/mmerror.o
 OFILES += $(CURDIR)/build/mmio.o
@@ -36,11 +37,23 @@ OFILES += $(CURDIR)/build/load_ult.o
 OFILES += $(CURDIR)/build/load_uni.o
 OFILES += $(CURDIR)/build/load_xm.o
 # OFILES += $(CURDIR)/build/load_gt2.o
-# OFILES += $(CURDIR)/build/load_umx.o
+OFILES += $(CURDIR)/build/load_umx.o
+
+OFILES += $(CURDIR)/build/strcasecmp.o
+OFILES += $(CURDIR)/build/mmcmp.o
+OFILES += $(CURDIR)/build/pp20.o
+OFILES += $(CURDIR)/build/s404.o
+OFILES += $(CURDIR)/build/xpk.o
+
+# Rules for compiling helper functions
+$(CURDIR)/build/strcasecmp.o: $(CURDIR)/../posix/strcasecmp.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/strcasecmp.o $(CURDIR)/../posix/strcasecmp.c
 
 # Rules for compiling drivers
 $(CURDIR)/build/drv_n64.o: $(CURDIR)/../drivers/drv_n64.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_n64.o $(CURDIR)/../drivers/drv_n64.c
+$(CURDIR)/build/drv_nos.o: $(CURDIR)/../drivers/drv_nos.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_nos.o $(CURDIR)/../drivers/drv_nos.c
 
 # Rules for compiling io
 $(CURDIR)/build/mmalloc.o: $(CURDIR)/../mmio/mmalloc.c
@@ -121,5 +134,15 @@ $(CURDIR)/build/load_xm.o: $(CURDIR)/../loaders/load_xm.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_xm.o $(CURDIR)/../loaders/load_xm.c
 # $(CURDIR)/build/load_gt2.o: $(CURDIR)/../loaders/load_gt2.c
 # 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_gt2.o $(CURDIR)/../loaders/load_gt2.c
-# $(CURDIR)/build/load_umx.o: $(CURDIR)/../loaders/load_umx.c
-# 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_umx.o $(CURDIR)/../loaders/load_umx.c
+$(CURDIR)/build/load_umx.o: $(CURDIR)/../loaders/load_umx.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_umx.o $(CURDIR)/../loaders/load_umx.c
+
+# Rules for compiling depackers
+$(CURDIR)/build/mmcmp.o: $(CURDIR)/../depackers/mmcmp.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mmcmp.o $(CURDIR)/../depackers/mmcmp.c
+$(CURDIR)/build/pp20.o: $(CURDIR)/../depackers/pp20.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/pp20.o $(CURDIR)/../depackers/pp20.c
+$(CURDIR)/build/s404.o: $(CURDIR)/../depackers/s404.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/s404.o $(CURDIR)/../depackers/s404.c
+$(CURDIR)/build/xpk.o: $(CURDIR)/../depackers/xpk.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/xpk.o $(CURDIR)/../depackers/xpk.c

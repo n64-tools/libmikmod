@@ -53,6 +53,8 @@
 
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
+#else
+#include "limits.h"
 #endif
 
 #include <stdio.h>
