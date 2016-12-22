@@ -48,82 +48,83 @@ static short *buffer = NULL;
 
 static BOOL NS_IsThere(void)
 {
-	return 1;
+    return 1;
 }
 
 static BOOL NS_Init(void)
 {
     /* Stereo buffer, interleaved */
     buffer = malloc(sizeof(short) * 2 * audio_get_buffer_length());
-	return VC_Init();
+    return VC_Init();
 }
 
 static void NS_Exit(void)
 {
-	VC_Exit();
+    VC_Exit();
 
     /* No leaks please */
-    free(buffer);
+    MikMod_free(buffer);
     buffer = NULL;
 }
 
 static void NS_Update(void)
 {
-    /* Grab original */
-    if(md_mode & DMODE_STEREO)
+    if (audio_can_write())
     {
-        VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * 2 * sizeof(short));
-        audio_write(buffer);
-    }
-    else
-    {
-        /* Must dick around a bit for mono */
-        VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * sizeof(short));
+	/* Grab original */
+		if (md_mode & DMODE_STEREO)
+		{
+			VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * 2 * sizeof(short));
+			audio_write(buffer);
+		}
+		else
+		{
+			/* Must dick around a bit for mono */
+			VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * sizeof(short));
 
-        for(int i = audio_get_buffer_length() - 1; i >= 0; i--)
-        {
-            /* Copy in place must also work for byte zero */
-            buffer[(i * 2) + 1] = buffer[i];
-            buffer[i * 2] = buffer[i];
-        }
-        
-        audio_write(buffer);
+			for (int i = audio_get_buffer_length() - 1; i >= 0; i--)
+			{
+			/* Copy in place must also work for byte zero */
+			buffer[(i * 2) + 1] = buffer[i];
+			buffer[i * 2] = buffer[i];
+			}
+
+			audio_write(buffer);
+		}
     }
 }
 
-MIKMODAPI MDRIVER drv_n64={
-	NULL,
-	"Nintendo 64",
-	"N64 Driver v1.1",
-	255,255,
-	"n64",
-	NULL,
-	NULL,
-	NS_IsThere,
-	VC_SampleLoad,
-	VC_SampleUnload,
-	VC_SampleSpace,
-	VC_SampleLength,
-	NS_Init,
-	NS_Exit,
-	NULL,
-	VC_SetNumVoices,
-	VC_PlayStart,
-	VC_PlayStop,
-	NS_Update,
-	NULL,
-	VC_VoiceSetVolume,
-	VC_VoiceGetVolume,
-	VC_VoiceSetFrequency,
-	VC_VoiceGetFrequency,
-	VC_VoiceSetPanning,
-	VC_VoiceGetPanning,
-	VC_VoicePlay,
-	VC_VoiceStop,
-	VC_VoiceStopped,
-	VC_VoiceGetPosition,
-	VC_VoiceRealVolume
-};
-
+MIKMODAPI MDRIVER drv_n64 = {
+    NULL,
+    "Nintendo 64",
+    "N64 Driver v1.2",
+    255, 255,
+    "n64",
+    NULL,
+    NULL,
+    NS_IsThere,
+    VC_SampleLoad,
+    VC_SampleUnload,
+    VC_SampleSpace,
+    VC_SampleLength,
+    NS_Init,
+    NS_Exit,
+    NULL,
+    VC_SetNumVoices,
+    VC_PlayStart,
+    VC_PlayStop,
+    NS_Update,
+    NULL,
+    VC_VoiceSetVolume,
+    VC_VoiceGetVolume,
+    VC_VoiceSetFrequency,
+    VC_VoiceGetFrequency,
+    VC_VoiceSetPanning,
+    VC_VoiceGetPanning,
+    VC_VoicePlay,
+    VC_VoiceStop,
+    VC_VoiceStopped,
+    VC_VoiceGetPosition,
+    VC_VoiceRealVolume};
 
 /* ex:set ts=4: */

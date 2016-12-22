@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_med.c,v 1.1.1.1 2004/06/01 12:16:17 raph Exp $
+  $Id$
 
   Amiga MED module loader
 
@@ -159,7 +159,7 @@ static CHAR MED_Version[] = "OctaMED (MMDx)";
 
 /*========== Loader code */
 
-BOOL MED_Test(void)
+static BOOL MED_Test(void)
 {
 	UBYTE id[4];
 
@@ -170,25 +170,31 @@ BOOL MED_Test(void)
 	return 0;
 }
 
-BOOL MED_Init(void)
+static BOOL MED_Init(void)
 {
-	if (!(me = (MEDEXP *)_mm_malloc(sizeof(MEDEXP))))
+	if (!(me = (MEDEXP *)MikMod_malloc(sizeof(MEDEXP))))
 		return 0;
-	if (!(mh = (MEDHEADER *)_mm_malloc(sizeof(MEDHEADER))))
+	if (!(mh = (MEDHEADER *)MikMod_malloc(sizeof(MEDHEADER))))
 		return 0;
-	if (!(ms = (MEDSONG *)_mm_malloc(sizeof(MEDSONG))))
+	if (!(ms = (MEDSONG *)MikMod_malloc(sizeof(MEDSONG))))
 		return 0;
 	return 1;
 }
 
-void MED_Cleanup(void)
+static void MED_Cleanup(void)
 {
-	_mm_free(me);
-	_mm_free(mh);
-	_mm_free(ms);
-	_mm_free(ba);
-	_mm_free(mmd0pat);
-	_mm_free(mmd1pat);
+	MikMod_free(me);
+	MikMod_free(mh);
+	MikMod_free(ms);
+	MikMod_free(ba);
+	MikMod_free(mmd0pat);
+	MikMod_free(mmd1pat);
+	me = NULL;
+	mh = NULL;
+	ms = NULL;
+	ba = NULL;
+	mmd0pat = NULL;
+	mmd1pat = NULL;
 }
 
 static void EffectCvt(UBYTE eff, UBYTE dat)
@@ -346,10 +352,8 @@ static BOOL LoadMEDPatterns(void)
 	if (!AllocPatterns())
 		return 0;
 
-	if (!
-		(mmd0pat =
-		 (MMD0NOTE *)_mm_calloc(of.numchn * (maxlines + 1),
-								sizeof(MMD0NOTE)))) return 0;
+	if (!(mmd0pat = (MMD0NOTE *)MikMod_calloc(of.numchn * (maxlines + 1), sizeof(MMD0NOTE))))
+		return 0;
 
 	/* second read: read and convert patterns */
 	for (t = 0; t < of.numpat; t++) {
@@ -396,10 +400,8 @@ static BOOL LoadMMD1Patterns(void)
 	if (!AllocPatterns())
 		return 0;
 
-	if (!
-		(mmd1pat =
-		 (MMD1NOTE *)_mm_calloc(of.numchn * (maxlines + 1),
-								sizeof(MMD1NOTE)))) return 0;
+	if (!(mmd1pat = (MMD1NOTE *)MikMod_calloc(of.numchn * (maxlines + 1), sizeof(MMD1NOTE))))
+		return 0;
 
 	/* second read: really read and convert patterns */
 	for (t = 0; t < of.numpat; t++) {
@@ -426,7 +428,7 @@ static BOOL LoadMMD1Patterns(void)
 	return 1;
 }
 
-BOOL MED_Load(BOOL curious)
+static BOOL MED_Load(BOOL curious)
 {
 	int t;
 	ULONG sa[64];
@@ -515,7 +517,7 @@ BOOL MED_Load(BOOL curious)
 	}
 
 	/* alloc and read the blockpointer array */
-	if (!(ba = (ULONG *)_mm_calloc(ms->numblocks, sizeof(ULONG))))
+	if (!(ba = (ULONG *)MikMod_calloc(ms->numblocks, sizeof(ULONG))))
 		return 0;
 	_mm_fseek(modreader, mh->MEDBlockPP, SEEK_SET);
 	if (!_mm_read_M_ULONGS(ba, ms->numblocks, modreader)) {
@@ -571,7 +573,7 @@ BOOL MED_Load(BOOL curious)
 		of.flags |= UF_HIGHBPM;
 	}
 	MED_Version[12] = mh->id;
-	of.modtype = strdup(MED_Version);
+	of.modtype = MikMod_strdup(MED_Version);
 	of.numchn = 0;				/* will be counted later */
 	of.numpat = ms->numblocks;
 	of.numpos = ms->songlen;
@@ -582,10 +584,10 @@ BOOL MED_Load(BOOL curious)
 		char *name;
 
 		_mm_fseek(modreader, me->songname, SEEK_SET);
-		name = _mm_malloc(me->songnamelen);
+		name = (char *) MikMod_malloc(me->songnamelen);
 		_mm_read_UBYTES(name, me->songnamelen, modreader);
 		of.songname = DupStr(name, me->songnamelen, 1);
-		free(name);
+		MikMod_free(name);
 	} else
 		of.songname = DupStr(NULL, 0, 0);
 	if ((mh->MEDEXPP) && (me->annotxt) && (me->annolen)) {
@@ -680,24 +682,24 @@ BOOL MED_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *MED_LoadTitle(void)
+static CHAR *MED_LoadTitle(void)
 {
 	ULONG posit, namelen;
 	CHAR *name, *retvalue = NULL;
-	
+
 	_mm_fseek(modreader, 0x20, SEEK_SET);
 	posit = _mm_read_M_ULONG(modreader);
-	
+
 	if (posit) {
 		_mm_fseek(modreader, posit + 0x2C, SEEK_SET);
 		posit = _mm_read_M_ULONG(modreader);
 		namelen = _mm_read_M_ULONG(modreader);
 
 		_mm_fseek(modreader, posit, SEEK_SET);
-		name = _mm_malloc(namelen);
+		name = (CHAR*) MikMod_malloc(namelen);
 		_mm_read_UBYTES(name, namelen, modreader);
 		retvalue = DupStr(name, namelen, 1);
-		free(name);
+		MikMod_free(name);
 	}
 
 	return retvalue;

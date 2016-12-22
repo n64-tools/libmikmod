@@ -1,4 +1,4 @@
-CFLAGS = -std=gnu99 -O2 -G0 -Wall -mtune=vr4300 -march=vr4300 -I$(N64_INST)/include -I$(N64_INST)/mips64-elf/include -I$(CURDIR)/include/
+CFLAGS = -std=gnu99 -O2 -G0 -Wall -mtune=vr4300 -march=vr4300 -I$(N64_INST)/include -I$(N64_INST)/mips64-elf/include -I$(CURDIR)/../include/ -I$(CURDIR)/
 ASFLAGS = -mtune=vr4300 -march=vr4300
 N64PREFIX = $(N64_INST)/bin/mips64-elf-
 INSTALLDIR = $(N64_INST)
@@ -17,9 +17,9 @@ libmikmod.a: $(OFILES)
 $(CURDIR)/build/:
 	mkdir $(CURDIR)/build
 
-install: libmikmod.a $(CURDIR)/include/mikmod.h
+install: libmikmod.a $(CURDIR)/../include/mikmod.h
 	install -m 0644 libmikmod.a $(INSTALLDIR)/lib/libmikmod.a
-	install -m 0644 $(CURDIR)/include/mikmod.h $(INSTALLDIR)/include/mikmod.h
+	install -m 0644 $(CURDIR)/../include/mikmod.h $(INSTALLDIR)/include/mikmod.h
 
 .PHONY: clean
 clean:

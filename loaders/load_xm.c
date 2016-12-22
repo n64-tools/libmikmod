@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_xm.c,v 1.2 2005/03/30 19:10:07 realtech Exp $
+  $Id$
 
   Fasttracker (XM) module loader
 
@@ -59,7 +59,7 @@ typedef struct XMHEADER {
 	UWORD numchn;          /* Number of channels (2,4,6,8,10,...,32) */
 	UWORD numpat;          /* Number of patterns (max 256) */
 	UWORD numins;          /* Number of instruments (max 128) */
-	UWORD flags;       
+	UWORD flags;
 	UWORD tempo;           /* Default tempo */
 	UWORD bpm;             /* Default BPM */
 	UBYTE orders[256];     /* Pattern order table  */
@@ -129,14 +129,14 @@ typedef struct XMNOTE {
 static	XMNOTE *xmpat=NULL;
 static	XMHEADER *mh=NULL;
 
-/* increment unit for sample array MikMod_reallocation */
+/* increment unit for sample array reallocation */
 #define XM_SMPINCR 64
 static	ULONG *nextwav=NULL;
 static	XMWAVHEADER *wh=NULL,*s=NULL;
 
 /*========== Loader code */
 
-BOOL XM_Test(void)
+static BOOL XM_Test(void)
 {
 	UBYTE id[38];
 
@@ -146,27 +146,16 @@ BOOL XM_Test(void)
 	return 0;
 }
 
-BOOL XM_Init(void)
+static BOOL XM_Init(void)
 {
 	if(!(mh=(XMHEADER *)MikMod_malloc(sizeof(XMHEADER)))) return 0;
 	return 1;
 }
 
-void XM_Cleanup(void)
+static void XM_Cleanup(void)
 {
-	if(mh)
-		MikMod_free(mh);
-	if(xmpat)
-		MikMod_free(xmpat);
-	if(nextwav)
-		MikMod_free(nextwav);
-	if(wh)
-		MikMod_free(wh);
-	
-	mh = NULL;
-	xmpat = NULL;
-	nextwav = NULL;
-	wh = NULL;
+	MikMod_free(mh);
+	mh=NULL;
 }
 
 static int XM_ReadNote(XMNOTE* n)
@@ -371,8 +360,8 @@ static BOOL LoadPatterns(BOOL dummypat)
 				return 0;
 
 			/* when packsize is 0, don't try to load a pattern.. it's empty. */
-			if(ph.packsize) 
-				for(u=0;u<ph.numrows;u++) 
+			if(ph.packsize)
+				for(u=0;u<ph.numrows;u++)
 					for(v=0;v<of.numchn;v++) {
 						if(!ph.packsize) break;
 
@@ -455,15 +444,12 @@ static void FixEnvelope(ENVPT *cur, int pts)
 
 static BOOL LoadInstruments(void)
 {
-	int t,u;
+	int t,u, ck;
 	INSTRUMENT *d;
 	ULONG next=0;
 	UWORD wavcnt=0;
 
-	if(!AllocInstruments())
-	{
-		return 0;
-	}
+	if(!AllocInstruments()) return 0;
 	d=of.instruments;
 	for(t=0;t<of.numins;t++,d++) {
 		XMINSTHEADER ih;
@@ -475,6 +461,13 @@ static BOOL LoadInstruments(void)
 		headend     = _mm_ftell(modreader);
 		ih.size     = _mm_read_I_ULONG(modreader);
 		headend    += ih.size;
+		ck = _mm_ftell(modreader);
+		_mm_fseek(modreader,0,SEEK_END);
+		if ((headend<0) || (_mm_ftell(modreader)<headend) || (headend<ck)) {
+			_mm_fseek(modreader,ck,SEEK_SET);
+			break;
+		}
+		_mm_fseek(modreader,ck,SEEK_SET);
 		_mm_read_string(ih.name, 22, modreader);
 		ih.type     = _mm_read_UBYTE(modreader);
 		ih.numsmp   = _mm_read_I_UWORD(modreader);
@@ -508,7 +501,11 @@ static BOOL LoadInstruments(void)
 
 				/* read the remainder of the header
 				   (2 bytes for 1.03, 22 for 1.04) */
-				for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
+				if (headend>=_mm_ftell(modreader)) {
+					for(u=headend-_mm_ftell(modreader);u;u--) {
+						_mm_skip_BYTE(modreader);
+					}
+				}
 
 				/* we can't trust the envelope point count here, as some
 				   modules have incorrect values (K_OSPACE.XM reports 32 volume
@@ -517,8 +514,8 @@ static BOOL LoadInstruments(void)
 				if(pth.panpts>XMENVCNT/2) pth.panpts=XMENVCNT/2;
 
 				if((_mm_eof(modreader))||(pth.volpts>XMENVCNT/2)||(pth.panpts>XMENVCNT/2)) {
-					if(nextwav) { MikMod_free(nextwav);nextwav=NULL; }
-					if(wh) { MikMod_free(wh);wh=NULL; }
+					MikMod_free(nextwav);nextwav=NULL;
+					MikMod_free(wh);wh=NULL;
 					_mm_errno = MMERR_LOADING_SAMPLEINFO;
 					return 0;
 				}
@@ -568,7 +565,7 @@ static BOOL LoadInstruments(void)
 																			\
 				if ((d-> name/**/flg&EF_ON)&&(d-> name/**/pts<2))			\
 					d-> name/**/flg&=~EF_ON
-#endif			
+#endif
 
 				XM_ProcessEnvelope(vol);
 				XM_ProcessEnvelope(pan);
@@ -588,12 +585,12 @@ static BOOL LoadInstruments(void)
 					/* Allocate more room for sample information if necessary */
 					if(of.numsmp+u==wavcnt) {
 						wavcnt+=XM_SMPINCR;
-						if(!(nextwav=MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))){
-							if(wh) { MikMod_free(wh);wh=NULL; }
+						if(!(nextwav=(ULONG*)MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))){
+							MikMod_free(wh);wh=NULL;
 							_mm_errno = MMERR_OUT_OF_MEMORY;
 							return 0;
 						}
-						if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(XMWAVHEADER)))) {
+						if(!(wh=(XMWAVHEADER*)MikMod_realloc(wh,wavcnt*sizeof(XMWAVHEADER)))) {
 							MikMod_free(nextwav);nextwav=NULL;
 							_mm_errno = MMERR_OUT_OF_MEMORY;
 							return 0;
@@ -619,15 +616,12 @@ static BOOL LoadInstruments(void)
 					nextwav[of.numsmp+u]=next;
 					next+=s->length;
 
-					if(_mm_eof(modreader) && t < (of.numins - 1)) {
-						/* We should cut off at this point as it could be a bad XM file
-						   (some have max length set as maximum (31)) */
-						of.numins = t + 1;
-						
-						/*MikMod_free(nextwav);MikMod_free(wh);
+					/* last instrument is at the end of file in version 0x0104 */
+					if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
+						MikMod_free(nextwav);MikMod_free(wh);
 						nextwav=NULL;wh=NULL;
-						_mm_errno = MMERR_LOADING_SAMPLEINFO;*/
-						//return 0;
+						_mm_errno = MMERR_LOADING_SAMPLEINFO;
+						return 0;
 					}
 				}
 
@@ -639,17 +633,23 @@ static BOOL LoadInstruments(void)
 					of.numsmp+=ih.numsmp;
 			} else {
 				/* read the remainder of the header */
-				for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
+				ck = _mm_ftell(modreader);
+				_mm_fseek(modreader,0,SEEK_END);
+				if ((headend<0) || (_mm_ftell(modreader)<headend) || (headend<ck)) {
+					_mm_fseek(modreader,ck,SEEK_SET);
+					break;
+				}
+				_mm_fseek(modreader,ck,SEEK_SET);
+				for(u=headend-_mm_ftell(modreader);u;u--) {
+					_mm_skip_BYTE(modreader);
+				}
 
-				if(_mm_eof(modreader) && t < (of.numins - 1)) {
-					/* We should cut off at this point as it could be a bad XM file
-					   (some have max length set as maximum (31)) */
-					of.numins = t + 1;
-						
-					/*MikMod_free(nextwav);MikMod_free(wh);
+				/* last instrument is at the end of file in version 0x0104 */
+				if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
+					MikMod_free(nextwav);MikMod_free(wh);
 					nextwav=NULL;wh=NULL;
-					_mm_errno = MMERR_LOADING_SAMPLEINFO;*/
-					//return 0;
+					_mm_errno = MMERR_LOADING_SAMPLEINFO;
+					return 0;
 				}
 			}
 		}
@@ -657,8 +657,8 @@ static BOOL LoadInstruments(void)
 
 	/* sanity check */
 	if(!of.numsmp) {
-		if(nextwav) { MikMod_free(nextwav);nextwav=NULL; }
-		if(wh) { MikMod_free(wh);wh=NULL; }
+		MikMod_free(nextwav);nextwav=NULL;
+		MikMod_free(wh);wh=NULL;
 		_mm_errno = MMERR_LOADING_SAMPLEINFO;
 		return 0;
 	}
@@ -666,7 +666,7 @@ static BOOL LoadInstruments(void)
 	return 1;
 }
 
-BOOL XM_Load(BOOL curious)
+static BOOL XM_Load(BOOL curious)
 {
 	INSTRUMENT *d;
 	SAMPLE *q;
@@ -679,7 +679,6 @@ BOOL XM_Load(BOOL curious)
 	_mm_read_string(mh->songname,21,modreader);
 	_mm_read_string(mh->trackername,20,modreader);
 	mh->version     =_mm_read_I_UWORD(modreader);
-	
 	if((mh->version<0x102)||(mh->version>0x104)) {
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
@@ -693,31 +692,37 @@ BOOL XM_Load(BOOL curious)
 	mh->flags       =_mm_read_I_UWORD(modreader);
 	mh->tempo       =_mm_read_I_UWORD(modreader);
 	mh->bpm         =_mm_read_I_UWORD(modreader);
-	if(!mh->bpm) {
+	if(!mh->bpm || mh->songlength > 256) {
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-	_mm_read_UBYTES(mh->orders,256,modreader);
-
-	if(_mm_eof(modreader)) {
+/*	_mm_read_UBYTES(mh->orders,256,modreader);*/
+/*	_mm_read_UBYTES(mh->orders,mh->headersize-20,modreader);*/
+	_mm_read_UBYTES(mh->orders,mh->songlength,modreader);
+	if(_mm_fseek(modreader, mh->headersize+60, SEEK_SET) ||
+	   _mm_eof(modreader)) {
 		_mm_errno = MMERR_LOADING_HEADER;
 		return 0;
 	}
 
 	/* set module variables */
-	of.initspeed = mh->tempo;         
+	of.initspeed = mh->tempo;
 	of.inittempo = mh->bpm;
 	strncpy(tracker,mh->trackername,20);tracker[20]=0;
-	for(t=20;(tracker[t]<=' ')&&(t>=0);t--) tracker[t]=0;
-	
+	for(t=20;(t>=0)&&(tracker[t]<=' ');t--) tracker[t]=0;
+
 	/* some modules have the tracker name empty */
 	if (!tracker[0])
 		strcpy(tracker,"Unknown tracker");
 
+#ifdef HAVE_SNPRINTF
+	snprintf(modtype,60,"%s (XM format %d.%02d)",
+	                    tracker,mh->version>>8,mh->version&0xff);
+#else
 	sprintf(modtype,"%s (XM format %d.%02d)",
 	                tracker,mh->version>>8,mh->version&0xff);
-	
-	of.modtype   = strdup(modtype);
+#endif
+	of.modtype   = MikMod_strdup(modtype);
 	of.numchn    = mh->numchn;
 	of.numpat    = mh->numpat;
 	of.numtrk    = (UWORD)of.numpat*of.numchn;   /* get number of channels */
@@ -732,10 +737,7 @@ BOOL XM_Load(BOOL curious)
 
 	memset(of.chanvol,64,of.numchn);             /* store channel volumes */
 
-	if(!AllocPositions(of.numpos+1))
-	{
-		return 0;
-	}
+	if(!AllocPositions(of.numpos+1)) return 0;
 	for(t=0;t<of.numpos;t++)
 		of.positions[t]=mh->orders[t];
 
@@ -753,25 +755,13 @@ BOOL XM_Load(BOOL curious)
 	}
 
 	if(mh->version<0x0104) {
-		if(!LoadInstruments())
-		{
-			return 0;
-		}
-		if(!LoadPatterns(dummypat))
-		{
-			return 0;
-		}
+		if(!LoadInstruments()) return 0;
+		if(!LoadPatterns(dummypat)) return 0;
 		for(t=0;t<of.numsmp;t++)
 			nextwav[t]+=_mm_ftell(modreader);
 	} else {
-		if(!LoadPatterns(dummypat))
-		{
-			return 0;
-		}
-		if(!LoadInstruments())
-		{
-			return 0;
-		}
+		if(!LoadPatterns(dummypat)) return 0;
+		if(!LoadInstruments()) return 0;
 	}
 
 	if(!AllocSamples()) {
@@ -824,14 +814,14 @@ BOOL XM_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *XM_LoadTitle(void)
+static CHAR *XM_LoadTitle(void)
 {
-	CHAR s[21];
+	CHAR str[21];
 
 	_mm_fseek(modreader,17,SEEK_SET);
-	if(!_mm_read_UBYTES(s,21,modreader)) return NULL;
+	if(!_mm_read_UBYTES(str, 21, modreader)) return NULL;
 
-	return(DupStr(s,21,1));
+	return(DupStr(str,21,1));
 }
 
 /*========== Loader information */
