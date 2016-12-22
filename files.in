@@ -1,0 +1,119 @@
+OFILES  = $(CURDIR)/build/drv_n64.o
+OFILES += $(CURDIR)/build/mmalloc.o
+OFILES += $(CURDIR)/build/mmerror.o
+OFILES += $(CURDIR)/build/mmio.o
+OFILES += $(CURDIR)/build/mdreg.o
+OFILES += $(CURDIR)/build/mdulaw.o
+OFILES += $(CURDIR)/build/mlreg.o
+OFILES += $(CURDIR)/build/mwav.o
+OFILES += $(CURDIR)/build/sloader.o
+OFILES += $(CURDIR)/build/virtch.o
+OFILES += $(CURDIR)/build/mdriver.o
+OFILES += $(CURDIR)/build/mloader.o
+OFILES += $(CURDIR)/build/mlutil.o
+OFILES += $(CURDIR)/build/munitrk.o
+OFILES += $(CURDIR)/build/mplayer.o
+OFILES += $(CURDIR)/build/npertab.o
+OFILES += $(CURDIR)/build/virtch2.o
+OFILES += $(CURDIR)/build/virtch_common.o
+OFILES += $(CURDIR)/build/load_669.o
+OFILES += $(CURDIR)/build/load_amf.o
+OFILES += $(CURDIR)/build/load_asy.o
+OFILES += $(CURDIR)/build/load_dsm.o
+OFILES += $(CURDIR)/build/load_far.o
+OFILES += $(CURDIR)/build/load_gdm.o
+OFILES += $(CURDIR)/build/load_imf.o
+OFILES += $(CURDIR)/build/load_it.o
+OFILES += $(CURDIR)/build/load_m15.o
+OFILES += $(CURDIR)/build/load_med.o
+OFILES += $(CURDIR)/build/load_mod.o
+OFILES += $(CURDIR)/build/load_mtm.o
+OFILES += $(CURDIR)/build/load_okt.o
+OFILES += $(CURDIR)/build/load_s3m.o
+OFILES += $(CURDIR)/build/load_stm.o
+OFILES += $(CURDIR)/build/load_stx.o
+OFILES += $(CURDIR)/build/load_ult.o
+OFILES += $(CURDIR)/build/load_uni.o
+OFILES += $(CURDIR)/build/load_xm.o
+
+# Rules for compiling drivers
+$(CURDIR)/build/drv_n64.o: $(CURDIR)/drivers/drv_n64.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_n64.o $(CURDIR)/drivers/drv_n64.c
+
+# Rules for compiling io
+$(CURDIR)/build/mmalloc.o: $(CURDIR)/mmio/mmalloc.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mmalloc.o $(CURDIR)/mmio/mmalloc.c
+$(CURDIR)/build/mmerror.o: $(CURDIR)/mmio/mmerror.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mmerror.o $(CURDIR)/mmio/mmerror.c
+$(CURDIR)/build/mmio.o: $(CURDIR)/mmio/mmio.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mmio.o $(CURDIR)/mmio/mmio.c
+
+# Rules for compiling playercode
+$(CURDIR)/build/mdreg.o: $(CURDIR)/playercode/mdreg.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mdreg.o $(CURDIR)/playercode/mdreg.c
+$(CURDIR)/build/mdulaw.o: $(CURDIR)/playercode/mdulaw.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mdulaw.o $(CURDIR)/playercode/mdulaw.c
+$(CURDIR)/build/mlreg.o: $(CURDIR)/playercode/mlreg.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mlreg.o $(CURDIR)/playercode/mlreg.c
+$(CURDIR)/build/mwav.o: $(CURDIR)/playercode/mwav.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mwav.o $(CURDIR)/playercode/mwav.c
+$(CURDIR)/build/sloader.o: $(CURDIR)/playercode/sloader.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/sloader.o $(CURDIR)/playercode/sloader.c
+$(CURDIR)/build/virtch.o: $(CURDIR)/playercode/virtch.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/virtch.o $(CURDIR)/playercode/virtch.c
+$(CURDIR)/build/mdriver.o: $(CURDIR)/playercode/mdriver.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mdriver.o $(CURDIR)/playercode/mdriver.c
+$(CURDIR)/build/mloader.o: $(CURDIR)/playercode/mloader.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mloader.o $(CURDIR)/playercode/mloader.c
+$(CURDIR)/build/mlutil.o: $(CURDIR)/playercode/mlutil.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mlutil.o $(CURDIR)/playercode/mlutil.c
+$(CURDIR)/build/mplayer.o: $(CURDIR)/playercode/mplayer.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/mplayer.o $(CURDIR)/playercode/mplayer.c
+$(CURDIR)/build/munitrk.o: $(CURDIR)/playercode/munitrk.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/munitrk.o $(CURDIR)/playercode/munitrk.c
+$(CURDIR)/build/npertab.o: $(CURDIR)/playercode/npertab.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/npertab.o $(CURDIR)/playercode/npertab.c
+$(CURDIR)/build/virtch2.o: $(CURDIR)/playercode/virtch2.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/virtch2.o $(CURDIR)/playercode/virtch2.c
+$(CURDIR)/build/virtch_common.o: $(CURDIR)/playercode/virtch_common.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/virtch_common.o $(CURDIR)/playercode/virtch_common.c
+
+# Rules for compiling loaders
+$(CURDIR)/build/load_669.o: $(CURDIR)/loaders/load_669.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_669.o $(CURDIR)/loaders/load_669.c
+$(CURDIR)/build/load_amf.o: $(CURDIR)/loaders/load_amf.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_amf.o $(CURDIR)/loaders/load_amf.c
+$(CURDIR)/build/load_asy.o: $(CURDIR)/loaders/load_asy.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_asy.o $(CURDIR)/loaders/load_asy.c
+$(CURDIR)/build/load_dsm.o: $(CURDIR)/loaders/load_dsm.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_dsm.o $(CURDIR)/loaders/load_dsm.c
+$(CURDIR)/build/load_far.o: $(CURDIR)/loaders/load_far.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_far.o $(CURDIR)/loaders/load_far.c
+$(CURDIR)/build/load_gdm.o: $(CURDIR)/loaders/load_gdm.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_gdm.o $(CURDIR)/loaders/load_gdm.c
+$(CURDIR)/build/load_imf.o: $(CURDIR)/loaders/load_imf.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_imf.o $(CURDIR)/loaders/load_imf.c
+$(CURDIR)/build/load_it.o: $(CURDIR)/loaders/load_it.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_it.o $(CURDIR)/loaders/load_it.c
+$(CURDIR)/build/load_m15.o: $(CURDIR)/loaders/load_m15.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_m15.o $(CURDIR)/loaders/load_m15.c
+$(CURDIR)/build/load_med.o: $(CURDIR)/loaders/load_med.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_med.o $(CURDIR)/loaders/load_med.c
+$(CURDIR)/build/load_mod.o: $(CURDIR)/loaders/load_mod.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_mod.o $(CURDIR)/loaders/load_mod.c
+$(CURDIR)/build/load_mtm.o: $(CURDIR)/loaders/load_mtm.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_mtm.o $(CURDIR)/loaders/load_mtm.c
+$(CURDIR)/build/load_okt.o: $(CURDIR)/loaders/load_okt.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_okt.o $(CURDIR)/loaders/load_okt.c
+$(CURDIR)/build/load_s3m.o: $(CURDIR)/loaders/load_s3m.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_s3m.o $(CURDIR)/loaders/load_s3m.c
+$(CURDIR)/build/load_stm.o: $(CURDIR)/loaders/load_stm.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_stm.o $(CURDIR)/loaders/load_stm.c
+$(CURDIR)/build/load_stx.o: $(CURDIR)/loaders/load_stx.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_stx.o $(CURDIR)/loaders/load_stx.c
+$(CURDIR)/build/load_ult.o: $(CURDIR)/loaders/load_ult.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_ult.o $(CURDIR)/loaders/load_ult.c
+$(CURDIR)/build/load_uni.o: $(CURDIR)/loaders/load_uni.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_uni.o $(CURDIR)/loaders/load_uni.c
+$(CURDIR)/build/load_xm.o: $(CURDIR)/loaders/load_xm.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_xm.o $(CURDIR)/loaders/load_xm.c
