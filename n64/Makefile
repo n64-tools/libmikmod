@@ -1,4 +1,6 @@
-CFLAGS = -std=gnu99 -O2 -G0 -Wall -mtune=vr4300 -march=vr4300 -I$(N64_INST)/include -I$(N64_INST)/mips64-elf/include -I$(CURDIR)/../include/ -I$(CURDIR)/ -DDRV_N64
+CFLAGS = -std=gnu99 -O2 -G0 -Wall -mtune=vr4300 -march=vr4300 -I$(N64_INST)/include -I$(N64_INST)/mips64-elf/include -I$(CURDIR)/../include/ -I$(CURDIR)/ 
+CFLAGS += -DDRV_N64
+
 ASFLAGS = -mtune=vr4300 -march=vr4300
 N64PREFIX = $(N64_INST)/bin/mips64-elf-
 INSTALLDIR = $(N64_INST)

@@ -1,8 +1,8 @@
 OFILES  = $(CURDIR)/build/drv_raw.o
-OFILES  = $(CURDIR)/build/drv_wav.o
-OFILES  = $(CURDIR)/build/drv_aiff.o
-OFILES  = $(CURDIR)/build/drv_n64.o
-OFILES  = $(CURDIR)/build/drv_nos.o
+OFILES += $(CURDIR)/build/drv_wav.o
+OFILES += $(CURDIR)/build/drv_aiff.o
+OFILES += $(CURDIR)/build/drv_n64.o
+OFILES += $(CURDIR)/build/drv_nos.o
 OFILES += $(CURDIR)/build/mmalloc.o
 OFILES += $(CURDIR)/build/mmerror.o
 OFILES += $(CURDIR)/build/mmio.o

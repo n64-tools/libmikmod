@@ -35,15 +35,17 @@
 #include "config.h"
 #endif
 
+#include "mikmod_internals.h"
+
+#ifdef DRV_N64
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#ifdef DRV_N64
-
 #include <malloc.h>
 #include <audio.h>
-#include "mikmod_internals.h"
+
 
 static short *buffer = NULL;
 
@@ -70,29 +72,29 @@ static void NS_Exit(void)
 
 static void NS_Update(void)
 {
-    //if (audio_can_write())
-    //{
-    /* Grab original */
-    if (md_mode & DMODE_STEREO)
+    if (audio_can_write())
     {
-        VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * 2 * sizeof(short));
-        audio_write(buffer);
-    }
-    else
-    {
-        /* Must dick around a bit for mono */
-        VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * sizeof(short));
-
-        for (int i = audio_get_buffer_length() - 1; i >= 0; i--)
+        /* Grab original */
+        if (md_mode & DMODE_STEREO)
         {
-            /* Copy in place must also work for byte zero */
-            buffer[(i * 2) + 1] = buffer[i];
-            buffer[i * 2] = buffer[i];
+            VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * 2 * sizeof(short));
+            audio_write(buffer);
         }
+        else
+        {
+            /* Must dick around a bit for mono */
+            VC_WriteBytes((SBYTE *)buffer, audio_get_buffer_length() * sizeof(short));
 
-        audio_write(buffer);
+            for (int i = audio_get_buffer_length() - 1; i >= 0; i--)
+            {
+                /* Copy in place must also work for byte zero */
+                buffer[(i * 2) + 1] = buffer[i];
+                buffer[i * 2] = buffer[i];
+            }
+
+            audio_write(buffer);
+        }
     }
-    //}
 }
 
 MIKMODAPI MDRIVER drv_n64 = {
