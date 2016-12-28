@@ -1,6 +1,6 @@
-OFILES  = $(CURDIR)/build/drv_raw.o
-OFILES += $(CURDIR)/build/drv_wav.o
-OFILES += $(CURDIR)/build/drv_aiff.o
+# OFILES  = $(CURDIR)/build/drv_raw.o
+# OFILES += $(CURDIR)/build/drv_wav.o
+# OFILES += $(CURDIR)/build/drv_aiff.o
 OFILES += $(CURDIR)/build/drv_n64.o
 OFILES += $(CURDIR)/build/drv_nos.o
 OFILES += $(CURDIR)/build/mmalloc.o
@@ -39,7 +39,7 @@ OFILES += $(CURDIR)/build/load_stx.o
 OFILES += $(CURDIR)/build/load_ult.o
 OFILES += $(CURDIR)/build/load_uni.o
 OFILES += $(CURDIR)/build/load_xm.o
-# OFILES += $(CURDIR)/build/load_gt2.o
+OFILES += $(CURDIR)/build/load_gt2.o
 OFILES += $(CURDIR)/build/load_umx.o
 
 OFILES += $(CURDIR)/build/strcasecmp.o
@@ -57,12 +57,12 @@ $(CURDIR)/build/drv_nos.o: $(CURDIR)/../drivers/drv_nos.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_nos.o $(CURDIR)/../drivers/drv_nos.c
 $(CURDIR)/build/drv_n64.o: $(CURDIR)/../drivers/drv_n64.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_n64.o $(CURDIR)/../drivers/drv_n64.c
-$(CURDIR)/build/drv_raw.o: $(CURDIR)/../drivers/drv_raw.c
-	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_raw.o $(CURDIR)/../drivers/drv_raw.c
-$(CURDIR)/build/drv_aiff.o: $(CURDIR)/../drivers/drv_aiff.c
-	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_aiff.o $(CURDIR)/../drivers/drv_aiff.c
-$(CURDIR)/build/drv_wav.o: $(CURDIR)/../drivers/drv_wav.c
-	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_wav.o $(CURDIR)/../drivers/drv_wav.c
+# $(CURDIR)/build/drv_raw.o: $(CURDIR)/../drivers/drv_raw.c
+# 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_raw.o $(CURDIR)/../drivers/drv_raw.c
+# $(CURDIR)/build/drv_aiff.o: $(CURDIR)/../drivers/drv_aiff.c
+# 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_aiff.o $(CURDIR)/../drivers/drv_aiff.c
+# $(CURDIR)/build/drv_wav.o: $(CURDIR)/../drivers/drv_wav.c
+# 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/drv_wav.o $(CURDIR)/../drivers/drv_wav.c
 
 # Rules for compiling io
 $(CURDIR)/build/mmalloc.o: $(CURDIR)/../mmio/mmalloc.c
@@ -141,8 +141,8 @@ $(CURDIR)/build/load_uni.o: $(CURDIR)/../loaders/load_uni.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_uni.o $(CURDIR)/../loaders/load_uni.c
 $(CURDIR)/build/load_xm.o: $(CURDIR)/../loaders/load_xm.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_xm.o $(CURDIR)/../loaders/load_xm.c
-# $(CURDIR)/build/load_gt2.o: $(CURDIR)/../loaders/load_gt2.c
-# 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_gt2.o $(CURDIR)/../loaders/load_gt2.c
+$(CURDIR)/build/load_gt2.o: $(CURDIR)/../loaders/load_gt2.c
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_gt2.o $(CURDIR)/../loaders/load_gt2.c
 $(CURDIR)/build/load_umx.o: $(CURDIR)/../loaders/load_umx.c
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/load_umx.o $(CURDIR)/../loaders/load_umx.c
 
