@@ -27,15 +27,15 @@ jobs:
 
   - bash: |
       sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
-      sed -i -- 's|rm -f $(CURDIR)/build/*|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/n64/Makefile 
-      sed -i -- 's|/include -I$(CURDIR)/|/include -I$(CURDIR)/ -I$(CURDIR)/../toolchain/libdragon/include|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
+      sed -i -- 's|rm -f $(CURDIR)/build/*|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
+      sed -i -- 's|-I$(N64_INST)/mips64-elf/include -I$(CURDIR)/../include/ -I$(CURDIR)/|-I$(N64_INST)/mips64-elf/include -I$(CURDIR)/../include/ -I$(CURDIR)/  -I$(CURDIR)/../toolchain/libdragon/include|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
     displayName: 'Adjust Make Files for Windows'
     continueOnError: false
     
   - script: |
       set N64_INST="%BUILD_SOURCESDIRECTORY%\toolchain\gcc-toolchain-mips64"
       set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\toolchain\gcc-toolchain-mips64\bin
-      cd n64
+      cd %BUILD_SOURCESDIRECTORY%\n64
       make
     displayName: 'Build Lib'
     continueOnError: false
