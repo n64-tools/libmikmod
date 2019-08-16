@@ -65,7 +65,11 @@ jobs:
     inputs:
       gitHubConnection: libmikmod
       repositoryName: N64-tools/libmikmod
-      tagSource: manual
-      tag: $(Build.BuildNumber)      
+      #tagSource: manual
+      #tag: $(Build.BuildNumber)      
       assets: |
-           $(Build.ArtifactStagingDirectory)/*.*
+           $(Build.ArtifactStagingDirectory)/*
+      isDraft: true # Optional
+      action: 'create' # Options: create, edit, delete
+      target: '$(Build.SourceVersion)' # Required when action == Create || Action == Edit
+      tagSource: 'auto' # Required when action == Create# Options: auto, manual
