@@ -54,8 +54,18 @@ jobs:
     displayName: Publish Build Artifacts
     inputs:
       pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'binaries' 
+      artifactName: 'libmikmod' 
       publishLocation: 'Container' # Options: container, filePath
       #targetPath: # Required when publishLocation == FilePath
       parallel: true # Optional
       #parallelCount: # Optional
+
+  - task: GithubRelease@0 
+    displayName: 'Create GitHub Release'      
+    inputs:
+      gitHubConnection: N64-tools
+      repositoryName: N64-tools/libmikmod
+      tagSource: manual
+      tag: $(Build.BuildNumber)      
+      assets: |
+           $(Build.ArtifactStagingDirectory)/*.*
