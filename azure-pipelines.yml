@@ -3,29 +3,38 @@ jobs:
   pool:
     vmImage: 'vs2017-win2016'
   steps:
-
   - script: |
-      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-win64.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.2.0-20181107.6.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://dl.bintray.com/n64-tools/libdragon/libdragon-win64-20181211.4.zip --output libdragon-win64.zip
     displayName: 'Get dependencies'
     continueOnError: false
 
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
-      destinationFolder: gcc-toolchain-mips64
+      destinationFolder: toolchain/gcc-toolchain-mips64
       cleanDestinationFolder: false 
     displayName: 'Extract gcc-toolchain-mips64-win64'
+    continueOnError: false
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'libdragon-win64.zip' 
+      destinationFolder: toolchain/libdragon
+      cleanDestinationFolder: false 
+    displayName: 'Extract libdragon-win64'
     continueOnError: false
 
   - bash: |
       sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
       sed -i -- 's|rm -f $(CURDIR)/build/*|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/n64/Makefile 
+      sed -i -- 's|/include -I$(CURDIR)/|/include -I$(CURDIR)/ -I$(CURDIR)/../toolchain/libdragon/include|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
     displayName: 'Adjust Make Files for Windows'
     continueOnError: false
     
   - script: |
-      set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
-      set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin
+      set N64_INST="%BUILD_SOURCESDIRECTORY%\toolchain\gcc-toolchain-mips64"
+      set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\toolchain\gcc-toolchain-mips64\bin
       cd n64
       make
     displayName: 'Build Lib'
