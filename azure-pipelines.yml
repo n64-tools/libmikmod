@@ -1,0 +1,52 @@
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+
+  - script: |
+      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-win64.zip --output gcc-toolchain-mips64-win64.zip
+    displayName: 'Get dependencies'
+    continueOnError: false
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
+      destinationFolder: gcc-toolchain-mips64
+      cleanDestinationFolder: false 
+    displayName: 'Extract gcc-toolchain-mips64-win64'
+    continueOnError: false
+
+  - bash: |
+      sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/n64/Makefile
+      sed -i -- 's|rm -f $(CURDIR)/build/*|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/n64/Makefile 
+    displayName: 'Adjust Make Files for Windows'
+    continueOnError: false
+    
+  - script: |
+      set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
+      set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin
+      cd n64
+      make
+    displayName: 'Build Lib'
+    continueOnError: false
+
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/include/
+      cp "$BUILD_SOURCESDIRECTORY/include/mikmod.h" "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/lib/
+      cp "$BUILD_SOURCESDIRECTORY/n64/"*.a "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
+
+  # Publish build artifacts to Azure Artifacts/TFS or a file share
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'binaries' 
+      publishLocation: 'Container' # Options: container, filePath
+      #targetPath: # Required when publishLocation == FilePath
+      parallel: true # Optional
+      #parallelCount: # Optional
