@@ -59,17 +59,40 @@ jobs:
       #targetPath: # Required when publishLocation == FilePath
       parallel: true # Optional
       #parallelCount: # Optional
-
-  - task: GithubRelease@0 
-    displayName: 'Create GitHub Release'      
+      
+  # Archive Files
+  # Archive files using compression formats such as .7z, .rar, .tar.gz, and .zip.
+  - task: ArchiveFiles@2
     inputs:
-      gitHubConnection: libmikmod
-      repositoryName: N64-tools/libmikmod
-      #tagSource: manual
-      #tag: $(Build.BuildNumber)      
-      assets: |
-           $(Build.ArtifactStagingDirectory)/*
-      isDraft: true # Optional
-      action: 'create' # Options: create, edit, delete
-      target: '$(Build.SourceVersion)' # Required when action == Create || Action == Edit
-      tagSource: 'auto' # Required when action == Create# Options: auto, manual
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)' 
+      includeRootFolder: false
+      archiveType: 'zip' # Options: zip, 7z, tar, wim
+      #tarCompression: 'gz' # Optional. Options: gz, bz2, xz, none
+      archiveFile: '$(Build.ArtifactStagingDirectory)/libmikmod.zip' 
+      #replaceExistingArchive: true
+
+  - task: AzureFileCopy@3
+    inputs:
+      sourcePath: '$(Build.ArtifactStagingDirectory)\*.zip'
+      azureSubscription: 'MsdnAzureServiceRole'
+      Destination: 'AzureBlob'
+      storage: 'n64tools'
+      ContainerName: 'binaries'
+      blobPrefix: 'N64-tools/libs/$(Build.SourceBranchName)/latest/'
+      outputStorageUri: 'outputStorageUri'
+    displayName: Upload program to Blob storage
+    #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+#  - task: GithubRelease@0 
+#    displayName: 'Create GitHub Release'      
+#    inputs:
+#      gitHubConnection: libmikmod
+#      repositoryName: N64-tools/libmikmod
+#      #tagSource: manual
+#      #tag: $(Build.BuildNumber)      
+#      assets: |
+#           $(Build.ArtifactStagingDirectory)/*
+#      isDraft: true # Optional
+#      action: 'create' # Options: create, edit, delete
+#      target: '$(Build.SourceVersion)' # Required when action == Create || Action == Edit
+#      tagSource: 'auto' # Required when action == Create# Options: auto, manual
