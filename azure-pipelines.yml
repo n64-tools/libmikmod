@@ -4,8 +4,8 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
   - script: |
-      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.2.0-20181107.6.zip --output gcc-toolchain-mips64-win64.zip
-      curl -L https://dl.bintray.com/n64-tools/libdragon/libdragon-win64-20181211.4.zip --output libdragon-win64.zip
+      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-win64.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/libdragon/develop/latest/libdragon-win64.zip --output libdragon-win64.zip
     displayName: 'Get dependencies'
     continueOnError: false
 
