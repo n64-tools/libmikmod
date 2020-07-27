@@ -1,6 +1,6 @@
 trigger:
   branches:
-    include: ["master", "trunk", "develop*", "release-*", "refs/tags/*" ]
+    include: ["master", "trunk", "develop*", "n64-*", "refs/tags/*" ]
   paths:
     exclude: [ "doc", "*.md", ".gitignore", "README.md" ]
 
