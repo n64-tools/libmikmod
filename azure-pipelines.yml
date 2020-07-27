@@ -1,7 +1,13 @@
+trigger:
+  branches:
+    include: ["master", "trunk", "develop*", "release-*", "refs/tags/*" ]
+  paths:
+    exclude: [ "doc", "*.md", ".gitignore", "README.md" ]
+
 jobs:
 - job: Windows
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   steps:
   - script: |
       curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-win64.zip --output gcc-toolchain-mips64-win64.zip
